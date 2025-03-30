@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teachers Helping System</title>
+    <style>
+        :root {
+            --primary: #6a11cb;
+            --secondary: #2575fc;
+            --accent: #ff6b6b;
+            --dark: #2c3e50;
+            --light: #f8f9fa;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            height: 100vh;
+            overflow: hidden;
+            color: white;
+            position: relative;
+        }
+
+        /* Particle Background */
+        #particles-js {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+
+        /* Main Container */
+        .container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+        }
+
+        /* Slide Menu */
+        .slide-menu {
+            width: 280px;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+            position: fixed;
+            z-index: 100;
+        }
+
+        .slide-menu.active {
+            transform: translateX(0);
+        }
+
+        .menu-header {
+            text-align: center;
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .profile-pic {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--accent);
+            margin: 0 auto 10px;
+            cursor: pointer;
+        }
+
+        .menu-links {
+            margin-top: 30px;
+        }
+
+        .menu-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            margin: 8px 0;
+            border-radius: 8px;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .menu-link:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .menu-link i {
+            margin-right: 10px;
+            font-size: 20px;
+        }
+
+        /* Menu Toggle Button */
+        .menu-toggle {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 101;
+            background: rgba(0, 0, 0, 0.7);
+            border: none;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s;
+        }
+
+        .menu-toggle:hover {
+            background: var(--accent);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            transition: margin-left 0.3s;
+        }
+
+        .page {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Card Styles */
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Buttons */
+        .btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: inline-block;
+            margin: 5px 0;
+        }
+
+        .btn:hover {
+            background: #ff4757;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        }
+
+        /* Form Elements */
+        input, textarea, select {
+            width: 100%;
+            padding: 12px 15px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        /* To-Do List */
+        #todo-list {
+            list-style: none;
+        }
+
+        #todo-list li {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin: 8px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Timetable Grid */
+        .timetable {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+        }
+
+        .timetable-cell {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 8px;
+            min-height: 80px;
+        }
+
+        /* Profile Picture Upload */
+        #profile-upload {
+            display: none;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .slide-menu {
+                width: 250px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <!-- Particle Background -->
+    <div id="particles-js"></div>
+
+    <!-- Slide Menu -->
+    <div class="slide-menu">
+        <div class="menu-header">
+            <img src="https://ui-avatars.com/api/?name=Teacher+User&background=ff6b6b&color=fff" alt="Profile" class="profile-pic" id="profile-pic" onclick="document.getElementById('profile-upload').click()">
+            <input type="file" id="profile-upload" accept="image/*" onchange="uploadProfilePic(event)">
+            <h3 id="menu-username">Guest User</h3>
+            <p id="menu-email">guest@example.com</p>
+        </div>
+        <div class="menu-links">
+            <a href="#" class="menu-link" onclick="showPage('home')">
+                <i class="fas fa-home"></i> Home
+            </a>
+            <a href="#" class="menu-link" onclick="showPage('profile')">
+                <i class="fas fa-user"></i> Profile
+            </a>
+            <a href="#" class="menu-link" onclick="showPage('timetable')">
+                <i class="fas fa-calendar-alt"></i> Timetable
+            </a>
+            <a href="#" class="menu-link" onclick="showPage('todo')">
+                <i class="fas fa-tasks"></i> To-Do List
+            </a>
+            <a href="#" class="menu-link" onclick="showPage('grades')">
+                <i class="fas fa-book"></i> Gradebook
+            </a>
+            <a href="#" class="menu-link" onclick="showPage('resources')">
+                <i class="fas fa-folder"></i> Resources
+            </a>
+            <a href="#" class="menu-link" onclick="logout()" id="logout-btn">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </div>
+    </div>
+
+    <!-- Menu Toggle Button -->
+    <button class="menu-toggle" onclick="toggleMenu()">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="main-content" id="main-content">
+            <!-- Welcome Page -->
+            <div id="welcome" class="page active">
+                <div class="card">
+                    <h1 style="font-size: 2.5rem; margin-bottom: 20px;">Teachers Helping System</h1>
+                    <p style="margin-bottom: 30px;">Your all-in-one teaching assistant platform</p>
+                    <button class="btn" onclick="showPage('login')">Login</button>
+                    <button class="btn" onclick="showPage('signup')" style="background: rgba(255,255,255,0.1);">Sign Up</button>
+                </div>
+            </div>
+
+            <!-- Login Page -->
+            <div id="login" class="page">
+                <div class="card">
+                    <h2><i class="fas fa-lock"></i> Secure Login</h2>
+                    <form onsubmit="return validateLogin()">
+                        <input type="text" id="login-username" placeholder="Username" required>
+                        <input type="password" id="login-password" placeholder="Password" required>
+                        <button type="submit" class="btn">Login</button>
+                    </form>
+                    <p style="margin-top: 15px; font-size: 0.9rem;">Don't have an account? <a href="#" onclick="showPage('signup')" style="color: var(--accent);">Sign up</a></p>
+                </div>
+            </div>
+
+            <!-- Signup Page -->
+            <div id="signup" class="page">
+                <div class="card">
+                    <h2><i class="fas fa-user-plus"></i> Create Account</h2>
+                    <form onsubmit="return validateSignup()">
+                        <input type="text" id="signup-username" placeholder="Username" required>
+                        <input type="email" id="signup-email" placeholder="Email" required>
+                        <input type="password" id="signup-password" placeholder="Password" required>
+                        <input type="password" id="signup-confirm" placeholder="Confirm Password" required>
+                        <button type="submit" class="btn">Sign Up</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Home Page -->
+            <div id="home" class="page">
+                <div class="card">
+                    <h2>Welcome, <span id="display-username">Teacher</span>!</h2>
+                    <p>What would you like to do today?</p>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 20px;">
+                        <div class="card" style="cursor: pointer;" onclick="showPage('timetable')">
+                            <i class="fas fa-calendar-alt" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                            <h3>Timetable</h3>
+                        </div>
+                        <div class="card" style="cursor: pointer;" onclick="showPage('todo')">
+                            <i class="fas fa-tasks" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                            <h3>To-Do List</h3>
+                        </div>
+                        <div class="card" style="cursor: pointer;" onclick="showPage('grades')">
+                            <i class="fas fa-book" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                            <h3>Gradebook</h3>
+                        </div>
+                        <div class="card" style="cursor: pointer;" onclick="showPage('resources')">
+                            <i class="fas fa-folder" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                            <h3>Resources</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Page -->
+            <div id="profile" class="page">
+                <div class="card">
+                    <h2><i class="fas fa-user"></i> My Profile</h2>
+                    <div style="text-align: center; margin: 20px 0;">
+                        <img src="https://ui-avatars.com/api/?name=Teacher+User&background=ff6b6b&color=fff" alt="Profile" class="profile-pic" id="profile-display-pic" onclick="document.getElementById('profile-upload').click()">
+                        <h3 id="profile-username">Guest User</h3>
+                        <p id="profile-email">guest@example.com</p>
+                    </div>
+                    <button class="btn" onclick="logout()">Logout</button>
+                </div>
+            </div>
+
+            <!-- Timetable Page -->
+            <div id="timetable" class="page">
+                <div class="card">
+                    <h2><i class="fas fa-calendar-alt"></i> My Timetable</h2>
+                    <div class="timetable">
+                        <div class="timetable-cell">Monday</div>
+                        <div class="timetable-cell">Tuesday</div>
+                        <div class="timetable-cell">Wednesday</div>
+                        <div class="timetable-cell">Thursday</div>
+                        <div class="timetable-cell">Friday</div>
+                        <div class="timetable-cell" contenteditable="true">DSA 8:00-9:30</div>
+                        <div class="timetable-cell" contenteditable="true">MP 9:30-10:30</div>
+                        <div class="timetable-cell" contenteditable="true">PPL 10:45-11:45</div>
+                        <div class="timetable-cell" contenteditable="true">SE 11:45-12:45</div>
+                        <div class="timetable-cell" contenteditable="true">PBL 1:30-3:30</div>
+                    </div>
+                    <button class="btn" style="margin-top: 20px;" onclick="saveTimetable()">Save Timetable</button>
+                </div>
+            </div>
+
+            <!-- To-Do List Page -->
+            <div id="todo" class="page">
+                <div class="card">
+                    <h2><i class="fas fa-tasks"></i> My To-Do List</h2>
+                    <div style="display: flex; margin-bottom: 15px;">
+                        <input type="text" id="todo-input" placeholder="Add new task..." style="flex: 1; margin-right: 10px;">
+                        <button class="btn" onclick="addTask()" style="width: auto; padding: 0 20px;">Add</button>
+                    </div>
+                    <ul id="todo-list"></ul>
+                </div>
+            </div>
+
+            <!-- Gradebook Page -->
+            <div id="grades" class="page">
+                <div class="card">
+                    <h2><i class="fas fa-book"></i> Gradebook</h2>
+                    <p style="margin: 20px 0;">Grade management coming soon!</p>
+                </div>
+            </div>
+
+            <!-- Resources Page -->
+            <div id="resources" class="page">
+                <div class="card">
+                    <h2><i class="fas fa-folder"></i> Teaching Resources</h2>
+                    <p style="margin: 20px 0;">Resource library coming soon!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+        // Initialize particles.js
+        particlesJS("particles-js", {
+            particles: {
+                number: { value: 80, density: { enable: true, value_area: 800 } },
+                color: { value: "#ffffff" },
+                shape: { type: "circle" },
+                opacity: { value: 0.5, random: true },
+                size: { value: 3, random: true },
+                line_linked: { enable: true, distance: 150, color: "#ffffff", opacity: 0.4, width: 1 },
+                move: { enable: true, speed: 2, direction: "none", random: true, straight: false, out_mode: "out" }
+            },
+            interactivity: {
+                detect_on: "canvas",
+                events: {
+                    onhover: { enable: true, mode: "repulse" },
+                    onclick: { enable: true, mode: "push" }
+                }
+            }
+        });
+
+        // Toggle slide menu
+        function toggleMenu() {
+            document.querySelector('.slide-menu').classList.toggle('active');
+        }
+
+        // Show specific page
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+            
+            // Close menu when navigating (on mobile)
+            if (window.innerWidth < 768) {
+                document.querySelector('.slide-menu').classList.remove('active');
+            }
+        }
+
+        // User authentication
+        let currentUser = null;
+        const users = {};
+
+        function validateLogin() {
+            const username = document.getElementById('login-username').value;
+            const password = document.getElementById('login-password').value;
+            
+            if (users[username] && users[username].password === password) {
+                currentUser = username;
+                updateUserInfo();
+                showPage('home');
+                return false;
+            } else {
+                alert('Invalid username or password');
+                return false;
+            }
+        }
+
+        function validateSignup() {
+            const username = document.getElementById('signup-username').value;
+            const email = document.getElementById('signup-email').value;
+            const password = document.getElementById('signup-password').value;
+            const confirm = document.getElementById('signup-confirm').value;
+            
+            if (password !== confirm) {
+                alert('Passwords do not match!');
+                return false;
+            }
+            
+            users[username] = { email, password };
+            currentUser = username;
+            updateUserInfo();
+            showPage('home');
+            return false;
+        }
+
+        function updateUserInfo() {
+            if (currentUser) {
+                document.getElementById('display-username').textContent = currentUser;
+                document.getElementById('menu-username').textContent = currentUser;
+                document.getElementById('profile-username').textContent = currentUser;
+                document.getElementById('menu-email').textContent = users[currentUser].email;
+                document.getElementById('profile-email').textContent = users[currentUser].email;
+            }
+        }
+
+        function logout() {
+            currentUser = null;
+            showPage('welcome');
+        }
+
+        // Profile picture upload
+        function uploadProfilePic(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('profile-pic').src = e.target.result;
+                    document.getElementById('profile-display-pic').src = e.target.result;
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // To-Do List functionality
+        function addTask() {
+            const input = document.getElementById('todo-input');
+            const task = input.value.trim();
+            
+            if (task) {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <span>${task}</span>
+                    <button onclick="this.parentElement.remove()" style="background: none; border: none; color: var(--accent); cursor: pointer;">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                `;
+                document.getElementById('todo-list').appendChild(li);
+                input.value = '';
+            }
+        }
+
+        // Save timetable
+        function saveTimetable() {
+            alert('Timetable saved successfully!');
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add sample user for testing
+            users['teacher'] = {
+                email: 'teacher@456.edu',
+                password: '123'
+            };
+        });
+    </script>
+</body>
+</html>
